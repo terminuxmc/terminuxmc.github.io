@@ -214,7 +214,7 @@ button { font: inherit; color: inherit; }
 }
 .menu-open .scrim { opacity: 1; pointer-events: auto; }
 
-.drawer-auth { display: none; }
+.auth-tab.drawer-auth { display: none; }
 
 /* ---------- Buttons ---------- */
 
@@ -495,7 +495,7 @@ dialog.tmc-dialog.show::backdrop { background: rgba(0, 0, 0, 0.55); }
   .topbar { padding: 10px 14px; gap: 12px; }
   .brand { font-size: 22px; }
   .menu-btn { display: inline-flex; }
-  .bar-auth { display: none; }
+  .auth-tab.bar-auth { display: none; }
 
   .mainnav {
     position: fixed;
@@ -533,7 +533,7 @@ dialog.tmc-dialog.show::backdrop { background: rgba(0, 0, 0, 0.55); }
   .menu-open .mainnav > a:nth-child(6) { transition-delay: 210ms; }
   .mainnav > a[aria-current="page"] { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--gold); }
   .nav-ink { display: none; }
-  .drawer-auth {
+  .auth-tab.drawer-auth {
     display: flex;
     flex-direction: column;
     align-items: stretch;

@@ -50,7 +50,9 @@
         </div>`;
     }
     const key = levelKey(relic, ability);
-    const level = Math.min(state.levels[key] ?? cap, cap);
+    // The chosen level is kept across rarities; a lower rarity only shows it clamped to that rarity's cap.
+    if (state.levels[key] === undefined) state.levels[key] = cap;
+    const level = Math.min(state.levels[key], cap);
     const slider =
       ability.maxLevel > 0
         ? `<div class="lvl">
@@ -222,8 +224,6 @@
       if (tab) {
         const rarity = Number(tab.dataset.rarity);
         state.rarity[relic.id] = rarity;
-        // A new rarity puts each slider at that rarity's cap
-        relic.abilities.forEach((a) => delete state.levels[levelKey(relic, a)]);
         row.querySelectorAll(".rtab").forEach((b) => b.setAttribute("aria-pressed", String(Number(b.dataset.rarity) === rarity)));
         const box = row.querySelector(".abilities");
         box.innerHTML = abilitiesHtml(relic, rarity);
