@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TerminuxMC</title>
+  <meta name="description" content="Relics, gear, the skill tree and player profiles of the Terminux Server AIO modpack.">
+  <meta name="theme-color" content="#1a1b1e">
+  <link rel="icon" type="image/png" href="img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?b=20261125021411">
+  <script>
+    // The theme is chosen before the page is drawn: the saved choice, else dark.
+    document.documentElement.dataset.theme = localStorage.getItem("tmc-theme") || "dark";
+  </script>
+</head>
+<body>
+  <header class="topbar">
+    <button type="button" class="icon-btn menu-btn" id="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mainnav">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line class="bar bar-1" x1="4" y1="6" x2="20" y2="6"/>
+          <line class="bar bar-2" x1="4" y1="12" x2="20" y2="12"/>
+          <line class="bar bar-3" x1="4" y1="18" x2="20" y2="18"/>
+        </g>
+      </svg>
+    </button>
+    <a class="brand" href="#relics">
+      <img src="img/logo.png" alt="" width="32" height="32">
+      <span>TerminuxMC</span>
+    </a>
+    <nav class="mainnav" id="mainnav" aria-label="Main">
+      <a href="#relics" data-page="relics">Relics</a>
+      <a href="#weapons" data-page="weapons">Weapons</a>
+      <a href="#armor" data-page="armor">Armor</a>
+      <a href="#tools" data-page="tools">Tools</a>
+      <a href="#tree" data-page="tree">Skill Tree</a>
+      <div class="nav-mods" id="nav-mods">
+        <button type="button" class="nav-mods-btn" aria-expanded="false" aria-controls="mods-pop">
+          Mods
+          <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        </button>
+        <div class="mods-pop" id="mods-pop"></div>
+      </div>
+      <a href="#profile" data-page="profile">Profile</a>
+      <span class="nav-ink" aria-hidden="true"></span>
+      <div class="auth-tab drawer-auth" data-auth-tab></div>
+    </nav>
+    <div class="topbar-end">
+      <button type="button" class="icon-btn theme-btn" id="theme-toggle" aria-label="Switch to light theme">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <mask id="moon-cut">
+            <rect x="0" y="0" width="24" height="24" fill="#fff"/>
+            <circle class="moon-bite" cx="17" cy="7" r="6.5" fill="#000"/>
+          </mask>
+          <circle class="sun-core" cx="12" cy="12" r="8.5" fill="currentColor" mask="url(#moon-cut)"/>
+          <g class="sun-rays" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="12" y1="1.5" x2="12" y2="3.5"/>
+            <line x1="12" y1="20.5" x2="12" y2="22.5"/>
+            <line x1="1.5" y1="12" x2="3.5" y2="12"/>
+            <line x1="20.5" y1="12" x2="22.5" y2="12"/>
+            <line x1="4.6" y1="4.6" x2="6" y2="6"/>
+            <line x1="18" y1="18" x2="19.4" y2="19.4"/>
+            <line x1="4.6" y1="19.4" x2="6" y2="18"/>
+            <line x1="18" y1="6" x2="19.4" y2="4.6"/>
+          </g>
+        </svg>
+      </button>
+      <div class="auth-tab bar-auth" data-auth-tab></div>
+    </div>
+  </header>
+  <div class="scrim" id="scrim"></div>
+
+  <main id="app" class="page" tabindex="-1"></main>
+
+  <footer class="footer">
+    <span>TerminuxMC · Terminux Server AIO</span>
+    <span>Minecraft 1.21.1 · NeoForge</span>
+  </footer>
+
+  <script src="js/main.js?b=20261125021411"></script>
+  <script src="js/relics.js?b=20261125021411"></script>
+  <script src="js/items.js?b=20261125021411"></script>
+  <script src="js/mods.js?b=20261125021411"></script>
+  <script type="module" src="js/auth.js?b=20261125021411"></script>
+</body>
+</html>
