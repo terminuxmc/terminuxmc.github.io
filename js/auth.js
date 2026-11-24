@@ -5,7 +5,9 @@
 // Data (rules: ../Planning/Firestore-Kurallari.txt):
 //   users/{uid}     private: { username, usernameLower, createdAt } (only its owner reads it)
 //   profiles/{uid}  public: { username }
-// Linking a Minecraft account and the profile data sent by the game come in a later step.
+//   linkRequests/{code} made by the game with /terminux add, valid 15 minutes: { mcUuid, mcName, writerUid, createdAt }
+//   mcLinks/{mcUuid}    a linked Minecraft account: { owner, writerUid, mcName, code, linkedAt }
+// The profile data sent by the game comes in a later step.
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
 import {
@@ -16,7 +18,18 @@ import {
   signOut,
   deleteUser,
 } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  deleteDoc,
+  writeBatch,
+  serverTimestamp,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA4YumHcwdD8GaVFFdXncNAeLZOBzXOjyo",
@@ -202,7 +215,14 @@ dialog.addEventListener("submit", async (e) => {
 
 // ---------- Profile page ----------
 
-TMC.PAGES.profile = (el) => {
+const head = (name) => `<span class="mc-head" aria-hidden="true">${esc((name || "?").charAt(0).toUpperCase())}</span>`;
+
+async function linkedAccounts() {
+  const snap = await getDocs(query(collection(db, "mcLinks"), where("owner", "==", user.uid)));
+  return snap.docs.map((d) => ({ uuid: d.id, ...d.data() }));
+}
+
+TMC.PAGES.profile = async (el) => {
   if (!user) {
     el.innerHTML = `
       <div class="page-head"><h1>Profile</h1></div>
@@ -214,13 +234,121 @@ TMC.PAGES.profile = (el) => {
     TMC.animateIn(el);
     return;
   }
+  el.innerHTML = `<div class="page-head"><h1>${esc((account && account.username) || "Profile")}</h1></div>`;
+  let links = [];
+  try {
+    links = await linkedAccounts();
+  } catch (err) {
+    el.insertAdjacentHTML("beforeend", `<section class="placeholder"><p>${esc(errorText(err))}</p></section>`);
+    TMC.animateIn(el);
+    return;
+  }
+  const how = `<p>To link a Minecraft account, type <code>/terminux add</code> in game and open the link it posts to chat while logged in here.</p>`;
   el.innerHTML = `
     <div class="page-head"><h1>${esc((account && account.username) || "Profile")}</h1></div>
     <section class="placeholder">
-      <p class="eyebrow">Minecraft account</p>
-      <p>No Minecraft account is linked yet. Linking is on its way: type <code>/terminux add</code> in game and confirm the link it sends to chat.</p>
+      <p class="eyebrow">Minecraft accounts</p>
+      ${
+        links.length
+          ? `<div class="mc-list">${links
+              .map(
+                (l) => `
+                <div class="mc-row" data-uuid="${esc(l.uuid)}">
+                  ${head(l.mcName)}
+                  <span class="mc-name">${esc(l.mcName)}</span>
+                  <button type="button" class="btn" data-unlink="${esc(l.uuid)}">Unlink</button>
+                </div>`
+              )
+              .join("")}</div>`
+          : `<p>No Minecraft account is linked yet.</p>`
+      }
+      ${how}
     </section>`;
   TMC.animateIn(el);
+  el.addEventListener("click", async (e) => {
+    const b = e.target.closest("[data-unlink]");
+    if (!b) return;
+    b.disabled = true;
+    b.textContent = "Unlinking…";
+    try {
+      await deleteDoc(doc(db, "mcLinks", b.dataset.unlink));
+      TMC.route(true);
+    } catch (err) {
+      b.disabled = false;
+      b.textContent = "Unlink";
+      alert(errorText(err));
+    }
+  });
+};
+
+// ---------- Link page: #link/CODE, opened from the link the game posts ----------
+
+TMC.PAGES.link = async (el, args) => {
+  const code = String((args && args[0]) || "").toUpperCase();
+  const shell = (body) => {
+    el.innerHTML = `<div class="page-head"><h1>Link a Minecraft account</h1></div><section class="placeholder link-card">${body}</section>`;
+    TMC.animateIn(el);
+  };
+  if (!/^[A-Z0-9]{8}$/.test(code)) {
+    shell(`<p>This link is not valid. Type <code>/terminux add</code> in game for a new one.</p>`);
+    return;
+  }
+  if (!user) {
+    shell(`
+      <p>Log in to the site account you want to link your Minecraft account to. No account yet? Sign up first.</p>
+      <div class="link-actions">
+        <button type="button" class="btn btn-gold" data-open-auth="login">Log in</button>
+        <button type="button" class="btn" data-open-auth="register">Sign up</button>
+      </div>`);
+    el.querySelectorAll("[data-open-auth]").forEach((b) => b.addEventListener("click", () => openDialog(b.dataset.openAuth)));
+    return;
+  }
+  let req;
+  try {
+    const snap = await getDoc(doc(db, "linkRequests", code));
+    req = snap.exists() ? snap.data() : null;
+  } catch {
+    req = null;
+  }
+  if (!req) {
+    shell(`<p>This link has expired or was already used. Links work for 15 minutes; type <code>/terminux add</code> in game for a new one.</p>`);
+    return;
+  }
+  shell(`
+    <div class="mc-row big">${head(req.mcName)}<span class="mc-name">${esc(req.mcName)}</span></div>
+    <p>Link this Minecraft account to <b>${esc((account && account.username) || "your account")}</b>? Its profile will show on your Profile page. A Minecraft account can belong to one site account at a time.</p>
+    <p class="auth-error" role="alert"></p>
+    <div class="link-actions">
+      <button type="button" class="btn btn-gold" id="link-confirm">Link account</button>
+      <a class="btn" href="#profile">Cancel</a>
+    </div>`);
+  const btn = el.querySelector("#link-confirm");
+  btn.addEventListener("click", async () => {
+    btn.disabled = true;
+    btn.textContent = "Linking…";
+    try {
+      const batch = writeBatch(db);
+      batch.set(doc(db, "mcLinks", req.mcUuid), {
+        owner: user.uid,
+        writerUid: req.writerUid,
+        mcName: req.mcName,
+        code,
+        linkedAt: serverTimestamp(),
+      });
+      batch.delete(doc(db, "linkRequests", code));
+      await batch.commit();
+      shell(`
+        <div class="mc-row big">${head(req.mcName)}<span class="mc-name">${esc(req.mcName)}</span></div>
+        <p>Linked. You can close this tab, or <a href="#profile">open your profile</a>.</p>`);
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = "Link account";
+      const taken = err && err.code === "permission-denied";
+      el.querySelector(".auth-error").textContent = taken
+        ? "This Minecraft account is already linked to a site account, or the link expired. Unlink it first, or get a new link with /terminux add."
+        : errorText(err);
+    }
+  });
 };
 
 // ---------- Session ----------
@@ -237,7 +365,7 @@ onAuthStateChanged(auth, async (u) => {
     }
   }
   renderTabs();
-  if (location.hash.startsWith("#profile")) TMC.route(true);
+  if (location.hash.startsWith("#profile") || location.hash.startsWith("#link")) TMC.route(true);
 });
 
 renderTabs();

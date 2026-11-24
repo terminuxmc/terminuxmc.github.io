@@ -57,7 +57,11 @@ const ink = document.querySelector(".nav-ink");
 /** Slides the gold line under the active tab. */
 function moveInk() {
   const active = nav.querySelector('a[aria-current="page"]');
-  if (!active || getComputedStyle(ink).display === "none") return;
+  if (!active) {
+    ink.style.opacity = "0";
+    return;
+  }
+  if (getComputedStyle(ink).display === "none") return;
   ink.style.width = active.offsetWidth + "px";
   ink.style.transform = `translateX(${active.offsetLeft}px)`;
   ink.style.opacity = "1";
