@@ -1,0 +1,95 @@
+/* Gems page. Loaded after style.css and items.css; reuses the item card (ic-*) and the theme variables. */
+
+.gm-groups { margin-bottom: 4px; }
+.gm-rowicon { width: 40px; height: 40px; flex: none; image-rendering: pixelated; }
+
+.gem-detail { gap: 18px; }
+
+.ic-tag.unique { background: rgba(255, 122, 107, 0.12); border-color: var(--error); color: var(--error); }
+.ic-tag.dim { background: var(--surface-2); color: var(--gold-text); border-color: var(--border-strong); }
+
+/* World tiers the gem drops in */
+.gm-tiers { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.gm-tier {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 8px 4px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+  opacity: 0.55;
+  transition: opacity var(--mid) var(--ease), background var(--mid) var(--ease);
+}
+.gm-tier b { font-family: "Pixelify Sans", monospace; font-size: 16px; color: var(--muted); }
+.gm-tier.on {
+  opacity: 1;
+  color: var(--soft);
+  background: linear-gradient(180deg, rgba(233, 177, 21, 0.14), transparent 80%), var(--surface);
+  border-color: var(--gold);
+}
+.gm-tier.on b { color: var(--gold-text); }
+
+/* Purity buttons */
+.gm-purity { display: flex; flex-wrap: wrap; gap: 6px; }
+.gm-pbtn {
+  font: 600 13px Inter, system-ui, sans-serif;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--soft);
+  cursor: pointer;
+  transition: background var(--fast) var(--ease), border-color var(--fast) var(--ease), color var(--fast) var(--ease), transform var(--fast) var(--ease);
+}
+.gm-pbtn:hover { border-color: var(--border-strong); }
+.gm-pbtn:active { transform: scale(0.95); }
+.gm-pbtn[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: var(--on-gold); }
+.gm-pbtn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* Bonus rows: slot on the left, its stat lines on the right */
+.gm-bonuses {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: opacity 120ms var(--ease);
+}
+.gm-bonuses.swap { opacity: 0.25; }
+.gm-bonus {
+  display: grid;
+  grid-template-columns: minmax(110px, 170px) minmax(0, 1fr);
+  gap: 16px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity var(--mid) var(--ease), transform var(--mid) var(--ease), background var(--fast) ease;
+}
+.gm-bonus:first-child { border-top: 0; }
+.row.open .gm-bonus { opacity: 1; transform: none; }
+.row.open .gm-bonus:nth-child(2) { transition-delay: 40ms; }
+.row.open .gm-bonus:nth-child(3) { transition-delay: 80ms; }
+.row.open .gm-bonus:nth-child(n + 4) { transition-delay: 120ms; }
+.gm-bonus:hover { background: var(--surface-2); }
+.gm-slot { font-size: 13px; font-weight: 600; color: var(--muted); padding-top: 2px; }
+.gm-parts { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.gm-part { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.gm-pname { font-size: 14px; color: var(--soft); min-width: 0; overflow-wrap: anywhere; }
+.gm-part.text .gm-pname { color: var(--violet-text); }
+.gm-pval { font-size: 15px; font-weight: 700; color: var(--gold-text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.gm-pval.neg { color: var(--error); }
+
+@media (max-width: 560px) {
+  .gm-tier { font-size: 0; padding: 6px 2px; }
+  .gm-tier b { font-size: 15px; }
+  .gm-bonus { grid-template-columns: 1fr; gap: 4px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gm-bonus, .gm-tier, .gm-pbtn, .gm-bonuses { transition: none; }
+}
