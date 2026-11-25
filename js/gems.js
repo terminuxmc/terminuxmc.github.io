@@ -23,6 +23,7 @@
     if (p.text) return "";
     const v = p.values[purity];
     if (v === undefined) return "–";
+    if (p.mult) return `×${TMC.num(1 + v)}`;
     const n = p.pct ? v * 100 : v;
     return `${n > 0 ? "+" : ""}${TMC.num(n)}${p.pct ? "%" : ""}`;
   }

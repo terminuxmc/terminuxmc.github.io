@@ -1,6 +1,7 @@
 /* Gems page. Loaded after style.css and items.css; reuses the item card (ic-*) and the theme variables. */
 
-.gm-groups { margin-bottom: 4px; }
+.chips-row.gm-groups { margin-bottom: 12px; }
+.chips-row.gm-tierchips { margin-top: 0; padding-top: 12px; border-top: 1px solid var(--border); }
 .gm-rowicon { width: 40px; height: 40px; flex: none; image-rendering: pixelated; }
 
 .gem-detail { gap: 18px; }
@@ -24,7 +25,7 @@
   opacity: 0.55;
   transition: opacity var(--mid) var(--ease), background var(--mid) var(--ease);
 }
-.gm-tier b { font-family: "Pixelify Sans", monospace; font-size: 16px; color: var(--muted); }
+.gm-tier b { font-family: Inter, system-ui, sans-serif; font-weight: 800; font-size: 15px; color: var(--muted); }
 .gm-tier.on {
   opacity: 1;
   color: var(--soft);
