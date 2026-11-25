@@ -7,7 +7,7 @@
 //   profiles/{uid}  public: { username }
 //   linkRequests/{code} made by the game with /terminux add, valid 15 minutes: { mcUuid, mcName, writerUid, createdAt }
 //   mcLinks/{mcUuid}    a linked Minecraft account: { owner, writerUid, mcName, code, linkedAt }
-// The profile data sent by the game comes in a later step.
+//   players/{mcUuid}/worlds/{worldId}  the character sent by the game (/terminux sync and automatic syncs), drawn by profile.js
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
 import {
@@ -265,6 +265,9 @@ TMC.PAGES.profile = async (el) => {
       ${how}
     </section>`;
   TMC.animateIn(el);
+  if (links.length && TMC.renderProfile) {
+    TMC.renderProfile(el, { links, fb: { db, collection, getDocs } }).catch(() => {});
+  }
   el.addEventListener("click", async (e) => {
     const b = e.target.closest("[data-unlink]");
     if (!b) return;

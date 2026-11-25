@@ -1,0 +1,156 @@
+/* Profile: characters sent by the game. Loaded after style.css, items.css and gems.css; uses the theme variables and
+   tree.css's mc-tooltip, tt-row and tt-effect. */
+
+.pf { display: flex; flex-direction: column; gap: 18px; margin-top: 22px; position: relative; }
+.pf-worlds { margin: 0; }
+.pf-world { display: flex; flex-direction: column; gap: 22px; transition: opacity 160ms var(--ease); }
+.pf-world.swap { opacity: 0.3; }
+
+.pf-head { display: flex; align-items: center; gap: 16px; }
+.pf-head .mc-head { width: 56px; height: 56px; font-size: 30px; }
+.pf-head-main { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.pf-head h2 { margin: 0; font-family: "Pixelify Sans", monospace; font-size: 28px; line-height: 1.1; }
+.pf-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.pf-sync { font-size: 13px; color: var(--muted); margin-left: 4px; }
+
+.pf-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.pf-section h3 { margin: 0; font-family: "Pixelify Sans", monospace; font-size: 20px; }
+
+/* Trees */
+.pf-trees { display: flex; flex-direction: column; gap: 12px; }
+.pf-trees .chips-row { margin: 0; }
+.pf-tree-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 14px; }
+.pf-tree { position: relative; height: 440px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); background: #120f17; }
+.pf-tree canvas { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+.pf-tree canvas:active { cursor: grabbing; }
+.pf-tree-side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 440px;
+  overflow-y: auto;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.pf-tree-side .btn { align-self: flex-start; margin-top: 4px; }
+
+/* Stats */
+.pf-stats, .pf-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0 18px; }
+.pf-group .eyebrow { grid-column: 1 / -1; margin: 10px 0 4px; }
+.pf-stat {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 2px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.pf-stat span { color: var(--soft); min-width: 0; overflow-wrap: anywhere; }
+.pf-stat b { color: var(--gold-text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pf-more summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--soft);
+  padding: 10px 0 4px;
+  list-style: none;
+  transition: color var(--fast) var(--ease);
+}
+.pf-more summary::-webkit-details-marker { display: none; }
+.pf-more summary::after { content: " ▾"; color: var(--muted); }
+.pf-more[open] summary::after { content: " ▴"; }
+.pf-more summary:hover { color: var(--gold-text); }
+.pf-groups { display: flex; flex-direction: column; animation: pf-in var(--mid) var(--ease); }
+@keyframes pf-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+/* Equipment */
+.pf-equip { display: grid; grid-template-columns: auto auto minmax(0, 1fr); gap: 18px; align-items: start; }
+.pf-block { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.pf-block .eyebrow { margin: 0; }
+.pf-col { display: flex; flex-direction: column; gap: 6px; }
+.pf-row { display: flex; gap: 6px; }
+.pf-row.wrap { flex-wrap: wrap; }
+.pf-slot { display: flex; align-items: center; gap: 10px; }
+.pf-slot-name { font-size: 12px; font-weight: 600; color: var(--muted); min-width: 72px; text-transform: capitalize; }
+.pf-slot-name em { font-style: normal; color: var(--soft); margin-left: 4px; }
+.pf-relic-type { display: flex; flex-direction: column; gap: 5px; margin-bottom: 6px; }
+
+.pf-item {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color var(--fast) var(--ease), transform var(--fast) var(--ease), background var(--fast) var(--ease);
+}
+.pf-item:hover { border-color: var(--gold); transform: translateY(-1px); }
+.pf-item:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.pf-item img { width: 40px; height: 40px; image-rendering: pixelated; }
+.pf-item.empty { cursor: default; background: var(--surface); border-style: dashed; }
+.pf-item.empty:hover { transform: none; border-color: var(--border); }
+.pf-item.bonus { border-color: var(--violet-line); }
+.pf-item.bonus.empty { background: var(--violet-bg); }
+.pf-letter { font-family: "Pixelify Sans", monospace; font-size: 22px; color: var(--soft); }
+.pf-count, .pf-lvl {
+  position: absolute;
+  right: 3px;
+  bottom: 1px;
+  font: 700 11px Inter, system-ui, sans-serif;
+  color: #fff;
+  text-shadow: 1px 1px 0 #000;
+}
+.pf-lvl { left: 3px; top: 2px; right: auto; bottom: auto; color: var(--c); }
+
+.pf-book { display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap; }
+.pf-spells { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px; flex: 1; min-width: 0; }
+.pf-spell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px 6px 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--sc);
+  border-radius: 8px;
+  font-size: 14px;
+}
+.pf-spell img { width: 36px; height: 36px; image-rendering: pixelated; border-radius: 4px; }
+.pf-spell-name { flex: 1; min-width: 0; color: var(--soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf-spell b { color: var(--gold-text); font-variant-numeric: tabular-nums; }
+
+/* Item tooltip */
+.pf-pop { pointer-events: none; z-index: 20; }
+.pf-tip-name { margin-bottom: 2px; }
+.pf-tip-sub { color: #aaaaaa; }
+.pf-gap { height: 6px; }
+
+@media (max-width: 860px) {
+  .pf-tree-layout { grid-template-columns: 1fr; }
+  .pf-tree { height: 340px; }
+  .pf-tree-side { max-height: none; }
+  .pf-equip { grid-template-columns: 1fr 1fr; }
+  .pf-relics { grid-column: 1 / -1; }
+}
+@media (max-width: 480px) {
+  .pf-equip { grid-template-columns: 1fr; }
+  .pf-head h2 { font-size: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pf-world, .pf-item, .pf-groups { transition: none; animation: none; }
+}
