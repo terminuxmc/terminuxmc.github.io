@@ -1,0 +1,36 @@
+/* Spells page. Reuses the item card (items.css), level buttons and chip rows (gems.css) and enchants.css rows. */
+
+.sp-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--sc, var(--muted));
+  margin-right: 7px;
+  vertical-align: 1px;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sc, var(--muted)) 25%, transparent);
+}
+.sp-chip[aria-pressed="true"] { background: var(--sc); border-color: var(--sc); color: var(--on-gold); }
+.sp-chip[aria-pressed="true"] .sp-dot { background: var(--on-gold); box-shadow: none; }
+
+.ic-tag.sp-school {
+  background: color-mix(in srgb, var(--sc) 16%, transparent);
+  border-color: color-mix(in srgb, var(--sc) 55%, transparent);
+  color: var(--sc);
+}
+[data-theme="light"] .ic-tag.sp-school { color: color-mix(in srgb, var(--sc) 60%, #000); }
+
+.sp-noicon { width: 40px; height: 40px; flex: none; border-radius: 8px; background: var(--surface-2); }
+.row-head img { border-radius: 6px; }
+
+.sp-rarity { font-weight: 700; }
+.sp-rarity.r1 { color: var(--r1); }
+.sp-rarity.r2 { color: var(--r2); }
+.sp-rarity.r3 { color: var(--r3); }
+.sp-rarity.r4 { color: var(--r4); }
+.sp-rarity.r5 { color: var(--r5); }
+
+.sp-stats { transition: opacity 120ms var(--ease); }
+.sp-stats.swap { opacity: 0.25; }
+.sp-stats .ic-stat.sp-line { grid-template-columns: 1fr; }
+.sp-stats .ic-stat.sp-line .ic-label { color: var(--soft); }
