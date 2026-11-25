@@ -33,6 +33,10 @@
       const gems = await TMC.loadJson("data/gems.json");
       gems.gems.forEach((g) => add(g.mod, g.modName));
     } catch {}
+    try {
+      const ench = await TMC.loadJson("data/enchantments.json");
+      ench.enchantments.forEach((e) => add(e.mod, e.modName));
+    } catch {}
     return [...mods.entries()].sort((a, b) => {
       if (LOCKED.has(a[0]) !== LOCKED.has(b[0])) return LOCKED.has(a[0]) ? -1 : 1;
       return a[1].localeCompare(b[1]);
