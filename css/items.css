@@ -1,0 +1,122 @@
+/* Weapons, Armor and Tools pages. Loaded after style.css; uses its theme variables. */
+
+/* ---------- Sort control ---------- */
+
+.sort-box { display: flex; align-items: center; gap: 8px; flex: none; }
+.sort-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 6px 0 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  transition: border-color var(--fast) var(--ease);
+}
+.sort-select:focus-within { border-color: var(--gold); }
+.sort-select select {
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: 600 14px Inter, system-ui, sans-serif;
+  padding: 8px 4px;
+  cursor: pointer;
+  outline: none;
+}
+.sort-select select option { background: var(--surface); color: var(--text); }
+.sort-dir { height: 42px; width: 42px; }
+.sort-dir svg { transition: transform var(--mid) var(--ease); }
+.sort-dir[data-dir="1"] svg { transform: rotate(180deg); }
+
+/* ---------- Item card in the open row ---------- */
+
+.detail.item-detail { padding: 22px 24px 26px; gap: 20px; }
+
+.ic-hero { display: flex; align-items: center; gap: 18px; }
+.ic-icon {
+  flex: none;
+  width: 88px;
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(233, 177, 21, 0.18), transparent 65%),
+    var(--surface-2);
+  border: 1px solid var(--border);
+}
+.ic-icon img { width: 64px; height: 64px; image-rendering: pixelated; }
+.row.open .ic-icon img { animation: ic-pop var(--slow) var(--ease) both; }
+@keyframes ic-pop {
+  from { transform: scale(0.7) rotate(-8deg); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.ic-head { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.ic-name { margin: 0; font-family: "Pixelify Sans", monospace; font-size: 26px; font-weight: 700; line-height: 1.15; }
+.ic-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.ic-tag {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 20px;
+  background: var(--surface-2);
+  color: var(--soft);
+  border: 1px solid var(--border);
+}
+.ic-tag.kind { background: var(--gold); border-color: var(--gold); color: var(--on-gold); }
+.ic-tag.mod { background: var(--violet-bg); border-color: var(--violet-line); color: var(--violet-text); }
+
+.ic-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.ic-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity var(--mid) var(--ease), transform var(--mid) var(--ease), border-color var(--fast) ease;
+}
+.row.open .ic-stat { opacity: 1; transform: none; }
+.row.open .ic-stat:nth-child(2) { transition-delay: 40ms; }
+.row.open .ic-stat:nth-child(3) { transition-delay: 80ms; }
+.row.open .ic-stat:nth-child(4) { transition-delay: 120ms; }
+.row.open .ic-stat:nth-child(5) { transition-delay: 160ms; }
+.row.open .ic-stat:nth-child(6) { transition-delay: 200ms; }
+.row.open .ic-stat:nth-child(7) { transition-delay: 240ms; }
+.ic-stat:hover { border-color: var(--border-strong); }
+.ic-stat.lead { border-color: var(--gold); background: linear-gradient(180deg, rgba(233, 177, 21, 0.1), transparent 70%), var(--surface); }
+.ic-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.ic-value { font-size: 22px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+.ic-stat.lead .ic-value { color: var(--gold-text); }
+.ic-stat.none .ic-value { color: var(--muted); }
+.ic-bar { display: block; height: 4px; border-radius: 2px; background: var(--surface-2); overflow: hidden; margin-top: 4px; }
+.ic-bar span {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 2px;
+  background: var(--gold);
+  transition: width 700ms var(--ease) 120ms;
+}
+.row.open .ic-bar span { width: var(--w); }
+
+.ic-others { display: flex; flex-direction: column; gap: 10px; }
+
+@media (max-width: 860px) {
+  .sort-box { flex: 1 1 100%; }
+  .sort-select { flex: 1; }
+  .sort-select select { flex: 1; }
+  .detail.item-detail { padding: 18px 14px 22px; }
+  .ic-icon { width: 72px; height: 72px; }
+  .ic-icon img { width: 52px; height: 52px; }
+  .ic-name { font-size: 22px; }
+  .ic-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

@@ -1,0 +1,156 @@
+/* Skill Tree page. Loaded after style.css.
+   The canvas itself is drawn like the game; the controls around it use the site's look. */
+
+.tree-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.tree-select {
+  min-width: 240px;
+  max-width: 100%;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font: 500 15px Inter, system-ui, sans-serif;
+  cursor: pointer;
+  transition: border-color var(--fast) var(--ease);
+}
+.tree-select:hover { border-color: var(--border-strong); }
+.tree-select:focus { border-color: var(--gold); outline: none; }
+
+.tree-tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.tree-tools .icon-btn { font: 600 20px Inter, sans-serif; }
+
+.tree-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 18px;
+  align-items: start;
+}
+
+.tree-wrap {
+  position: relative;
+  height: min(72vh, 760px);
+  min-height: 420px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #1d1d1d;
+}
+.tree-wrap.swap-in .tree-canvas { animation: fade var(--slow) var(--ease) both; }
+
+.tree-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+  image-rendering: pixelated;
+}
+
+.tree-hint {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  margin: 0;
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: rgba(16, 16, 18, 0.8);
+  color: #c9c9cf;
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.tree-jump { position: absolute; right: 12px; bottom: 10px; animation: rise var(--mid) var(--ease) both; }
+
+/* Minecraft's tooltip: near black with a purple frame, white title, colored lines */
+.mc-tooltip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 5;
+  max-width: 330px;
+  padding: 6px 8px 7px;
+  background: rgba(16, 0, 16, 0.94);
+  border: 2px solid transparent;
+  border-radius: 2px;
+  background-clip: padding-box;
+  box-shadow: 0 0 0 1px rgba(16, 0, 16, 0.94), inset 0 0 0 1px rgba(80, 0, 255, 0.31);
+  font-family: "Pixelify Sans", monospace;
+  font-size: 15px;
+  line-height: 1.35;
+  color: #aaaaaa;
+  pointer-events: none;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
+}
+.mc-tooltip::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 2px;
+  padding: 2px;
+  background: linear-gradient(180deg, rgba(80, 0, 255, 0.85), rgba(40, 0, 127, 0.85));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+.mc-tooltip .mc-title { color: #ffffff; margin-bottom: 2px; }
+
+/* Totals beside the tree */
+.tree-side {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: min(72vh, 760px);
+  min-height: 200px;
+  overflow-y: auto;
+}
+.tt-rows { display: flex; flex-direction: column; }
+.tt-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  animation: fade var(--mid) ease both;
+}
+.tt-row span { color: var(--soft); }
+.tt-row b { color: var(--gold-text); font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.tt-effect {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  font-size: 13px;
+  animation: fade var(--mid) ease both;
+}
+.tt-effect b { color: var(--gold-text); font-size: 14px; }
+.tt-effect span { color: var(--soft); }
+
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (max-width: 960px) {
+  .tree-layout { grid-template-columns: minmax(0, 1fr); }
+  .tree-side { max-height: none; }
+}
+
+@media (max-width: 860px) {
+  .tree-wrap { height: 62vh; min-height: 360px; }
+  .tree-select { flex: 1 1 100%; }
+  .tree-hint { display: none; }
+}
