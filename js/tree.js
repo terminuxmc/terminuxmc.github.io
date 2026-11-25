@@ -358,6 +358,10 @@
     let cat = cats.get(catId);
     let hover = null;
     let queued = false;
+    // Shift view: while Shift is held (or after a long press on touch) the tooltip shows the node's explained lines
+    let shiftHeld = false;
+    let touchDetail = false;
+    let lastTip = null;
 
     const shareHash = () => `#tree/${cat.id}/${encodePlan(cat)}`;
 
@@ -515,15 +519,19 @@
     function showTip(n, px, py) {
       if (!n) {
         tip.hidden = true;
+        lastTip = null;
         return;
       }
       const def = cat.defs[n.d];
       if (!def) return;
-      if (hover !== n || tip.hidden) {
+      const lines = (shiftHeld || touchDetail) && def.x ? def.x : def.d;
+      if (hover !== n || tip.hidden || tip._lines !== lines) {
         tip.innerHTML =
           `<div class="mc-title">${TMC.esc(def.t)}</div>` +
-          def.d.map(([t, c]) => `<div style="color:${mcColor(c)}">${TMC.esc(t)}</div>`).join("");
+          lines.map(([t, c]) => `<div style="color:${mcColor(c)}">${TMC.esc(t)}</div>`).join("");
+        tip._lines = lines;
       }
+      lastTip = { n, px, py };
       tip.hidden = false;
       const r = wrap.getBoundingClientRect();
       let x = px + 16;
@@ -533,11 +541,32 @@
       tip.style.transform = `translate(${Math.max(4, x)}px, ${Math.max(4, y)}px)`;
     }
 
+    function setShift(on) {
+      if (shiftHeld === on) return;
+      shiftHeld = on;
+      if (lastTip && !tip.hidden) showTip(lastTip.n, lastTip.px, lastTip.py);
+    }
+    const onShiftKey = (e) => {
+      if (!el.isConnected) {
+        window.removeEventListener("keydown", onShiftKey);
+        window.removeEventListener("keyup", onShiftKey);
+        window.removeEventListener("blur", onShiftBlur);
+        return;
+      }
+      if (e.key === "Shift") setShift(e.type === "keydown");
+    };
+    const onShiftBlur = () => setShift(false);
+    window.addEventListener("keydown", onShiftKey);
+    window.addEventListener("keyup", onShiftKey);
+    window.addEventListener("blur", onShiftBlur);
+
     // ---- Pointer: drag, pinch, click ----
 
     const pointers = new Map();
     let moved = 0;
     let pinch = null;
+    let longPress = 0;
+    let longPressed = false;
 
     function zoomAt(px, py, factor) {
       const before = toWorld(px, py);
@@ -556,7 +585,27 @@
         const [a, b] = [...pointers.values()];
         pinch = { d: Math.hypot(a.x - b.x, a.y - b.y) || 1, scale: view.scale };
       }
-      if (e.pointerType !== "mouse") tip.hidden = true;
+      if (e.pointerType !== "mouse") {
+        tip.hidden = true;
+        touchDetail = false;
+        clearTimeout(longPress);
+        longPressed = false;
+        // A long press on a node shows its Shift view instead of taking it
+        if (pointers.size === 1) {
+          const sx = e.offsetX;
+          const sy = e.offsetY;
+          longPress = setTimeout(() => {
+            if (pointers.size !== 1 || moved > 6) return;
+            const n = nodeAt(sx, sy);
+            if (!n) return;
+            longPressed = true;
+            touchDetail = true;
+            hover = null;
+            showTip(n, sx, sy);
+            hover = n;
+          }, 450);
+        }
+      }
     });
     canvas.addEventListener("pointermove", (e) => {
       const p = pointers.get(e.pointerId);
@@ -594,6 +643,11 @@
       pointers.delete(e.pointerId);
       if (pointers.size < 2) pinch = null;
       canvas.style.cursor = "grab";
+      clearTimeout(longPress);
+      if (longPressed) {
+        longPressed = false;
+        return;
+      }
       if (!p || moved > 6 || e.type === "pointercancel" || pointers.size > 0) return;
       const n = nodeAt(e.offsetX, e.offsetY);
       if (!n) {
@@ -610,6 +664,7 @@
         redraw();
       }
     };
+    canvas.addEventListener("contextmenu", (e) => e.preventDefault());
     canvas.addEventListener("pointerup", endPointer);
     canvas.addEventListener("pointercancel", endPointer);
     canvas.addEventListener("pointerleave", (e) => {

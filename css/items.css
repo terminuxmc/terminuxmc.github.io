@@ -71,33 +71,42 @@
 .ic-tag.kind { background: var(--gold); border-color: var(--gold); color: var(--on-gold); }
 .ic-tag.mod { background: var(--violet-bg); border-color: var(--violet-line); color: var(--violet-text); }
 
-.ic-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-.ic-stat {
+.ic-stats {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 12px 14px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
-  opacity: 0;
-  transform: translateY(6px);
-  transition: opacity var(--mid) var(--ease), transform var(--mid) var(--ease), border-color var(--fast) ease;
+  overflow: hidden;
 }
+.ic-stat {
+  display: grid;
+  grid-template-columns: minmax(120px, 200px) minmax(0, 1fr) 7.5em;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity var(--mid) var(--ease), transform var(--mid) var(--ease), background var(--fast) ease;
+}
+.ic-stat:first-child { border-top: 0; }
 .row.open .ic-stat { opacity: 1; transform: none; }
-.row.open .ic-stat:nth-child(2) { transition-delay: 40ms; }
-.row.open .ic-stat:nth-child(3) { transition-delay: 80ms; }
-.row.open .ic-stat:nth-child(4) { transition-delay: 120ms; }
-.row.open .ic-stat:nth-child(5) { transition-delay: 160ms; }
-.row.open .ic-stat:nth-child(6) { transition-delay: 200ms; }
-.row.open .ic-stat:nth-child(7) { transition-delay: 240ms; }
-.ic-stat:hover { border-color: var(--border-strong); }
-.ic-stat.lead { border-color: var(--gold); background: linear-gradient(180deg, rgba(233, 177, 21, 0.1), transparent 70%), var(--surface); }
-.ic-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
-.ic-value { font-size: 22px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
-.ic-stat.lead .ic-value { color: var(--gold-text); }
+.row.open .ic-stat:nth-child(2) { transition-delay: 30ms; }
+.row.open .ic-stat:nth-child(3) { transition-delay: 60ms; }
+.row.open .ic-stat:nth-child(4) { transition-delay: 90ms; }
+.row.open .ic-stat:nth-child(5) { transition-delay: 120ms; }
+.row.open .ic-stat:nth-child(6) { transition-delay: 150ms; }
+.row.open .ic-stat:nth-child(n + 7) { transition-delay: 180ms; }
+.ic-stat:hover { background: var(--surface-2); }
+.ic-stat.lead { background: linear-gradient(90deg, rgba(233, 177, 21, 0.1), transparent 60%); }
+.ic-label { font-size: 14px; font-weight: 500; color: var(--soft); }
+.ic-value { font-size: 16px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.ic-stat.lead .ic-label { color: var(--text); font-weight: 600; }
+.ic-stat.lead .ic-value { color: var(--gold-text); font-size: 18px; }
 .ic-stat.none .ic-value { color: var(--muted); }
-.ic-bar { display: block; height: 4px; border-radius: 2px; background: var(--surface-2); overflow: hidden; margin-top: 4px; }
+.ic-bar { display: block; height: 4px; border-radius: 2px; overflow: hidden; }
+.ic-bar:not(:empty) { background: var(--surface-2); }
 .ic-bar span {
   display: block;
   height: 100%;
@@ -108,7 +117,21 @@
 }
 .row.open .ic-bar span { width: var(--w); }
 
-.ic-others { display: flex; flex-direction: column; gap: 10px; }
+.ic-ability {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 18px;
+  background: var(--violet-bg);
+  border: 1px solid var(--violet-line);
+  border-left: 3px solid var(--violet-text);
+  border-radius: 10px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity var(--mid) var(--ease) 200ms, transform var(--mid) var(--ease) 200ms;
+}
+.row.open .ic-ability { opacity: 1; transform: none; }
+.ic-ability p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--text); }
 
 @media (max-width: 860px) {
   .sort-box { flex: 1 1 100%; }
@@ -118,5 +141,5 @@
   .ic-icon { width: 72px; height: 72px; }
   .ic-icon img { width: 52px; height: 52px; }
   .ic-name { font-size: 22px; }
-  .ic-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ic-stat { grid-template-columns: minmax(0, 1fr) 56px 6.5em; gap: 10px; padding: 9px 12px; }
 }

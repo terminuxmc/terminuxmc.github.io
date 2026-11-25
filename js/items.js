@@ -69,38 +69,54 @@
 
   const SLOT_NAMES = { head: "Head", chest: "Chest", legs: "Legs", feet: "Feet", body: "Body", offhand: "Off hand", mainhand: "Main hand" };
 
-  /** One stat block: label, value and a bar against the best item on the page. */
-  function block(label, value, max, opts = {}) {
+  /** One stat row: label, a bar against the best item on the page, value. */
+  function statRow(label, value, max, opts = {}) {
     const has = value !== null && value !== undefined;
-    const pct = has && max > 0 && !opts.noBar ? Math.max(4, Math.min(100, (100 * value) / max)) : 0;
+    const pct = has && max > 0 && !opts.noBar ? Math.max(3, Math.min(100, (100 * value) / max)) : 0;
     const text = has ? (opts.text || TMC.num(value)) : "–";
     return `
       <div class="ic-stat${opts.lead ? " lead" : ""}${has ? "" : " none"}">
         <span class="ic-label">${TMC.esc(label)}</span>
+        <span class="ic-bar" aria-hidden="true">${pct ? `<span style="--w:${pct.toFixed(1)}%"></span>` : ""}</span>
         <span class="ic-value">${TMC.esc(text)}</span>
-        ${pct ? `<span class="ic-bar" aria-hidden="true"><span style="--w:${pct.toFixed(1)}%"></span></span>` : ""}
       </div>`;
+  }
+
+  /** The item's own tooltip text (a unique weapon's ability, a set bonus), one paragraph per block of lines. */
+  function abilityHtml(item) {
+    const lines = item.description || [];
+    if (!lines.length) return "";
+    const paragraphs = [];
+    let current = [];
+    for (const line of lines) {
+      if (line.trim() === "") {
+        if (current.length) paragraphs.push(current);
+        current = [];
+      } else current.push(line);
+    }
+    if (current.length) paragraphs.push(current);
+    return `<div class="ic-ability">${paragraphs.map((p) => `<p>${p.map((l) => TMC.esc(l)).join("<br>")}</p>`).join("")}</div>`;
   }
 
   function detailHtml(item, max) {
     const s = statsOf(item);
-    const blocks = [];
+    const rows = [];
     if (item.category === "armor") {
-      blocks.push(block("Defence", s.defence, max.defence, { lead: true }));
-      blocks.push(block("Toughness", s.toughness, max.toughness));
-      blocks.push(block("Knockback resistance", s.kb, max.kb, { text: s.kb !== null ? TMC.num(s.kb * 10) : null }));
+      rows.push(statRow("Defence", s.defence, max.defence, { lead: true }));
+      rows.push(statRow("Toughness", s.toughness, max.toughness));
+      rows.push(statRow("Knockback resistance", s.kb, max.kb, { text: s.kb !== null ? TMC.num(s.kb * 10) : null }));
     } else {
-      blocks.push(block("Damage", s.damage, max.damage, { lead: true }));
-      blocks.push(block("Attack speed", s.speed, max.speed));
-      blocks.push(block("DPS", s.dps, max.dps));
+      rows.push(statRow("Damage", s.damage, max.damage, { lead: true }));
+      rows.push(statRow("Attack speed", s.speed, max.speed));
+      rows.push(statRow("DPS", s.dps, max.dps));
     }
-    blocks.push(block("Durability", s.durability, max.durability));
-    if (s.enchant !== null) blocks.push(block("Enchantability", s.enchant, max.enchant));
+    rows.push(statRow("Durability", s.durability, max.durability));
+    if (s.enchant !== null) rows.push(statRow("Enchantability", s.enchant, max.enchant));
     if (item.category !== "armor" && item.betterCombat) {
-      blocks.push(block("Hands", 1, 0, { text: item.betterCombat.twoHanded ? "Two-handed" : "One-handed", noBar: true }));
-      if (s.reach !== null) blocks.push(block("Reach", s.reach, max.reach, { text: (s.reach > 0 ? "+" : "") + TMC.num(s.reach) }));
+      rows.push(statRow("Hands", 1, 0, { text: item.betterCombat.twoHanded ? "Two-handed" : "One-handed", noBar: true }));
+      if (s.reach !== null) rows.push(statRow("Reach", s.reach, max.reach, { text: (s.reach > 0 ? "+" : "") + TMC.num(s.reach), noBar: s.reach < 0 }));
     }
-    const others = otherStats(item);
+    for (const a of otherStats(item)) rows.push(statRow(a.name, 1, 0, { text: formatModifier(a), noBar: true }));
     const slot = item.category === "armor" ? SLOT_NAMES[item.slot] || item.slot : null;
     return `
       <div class="detail item-detail">
@@ -115,17 +131,8 @@
             </div>
           </div>
         </div>
-        <div class="ic-stats">${blocks.join("")}</div>
-        ${
-          others.length
-            ? `<div class="ic-others">
-                 <p class="eyebrow">Other stats</p>
-                 <div class="attr-list">
-                   ${others.map((a) => `<div class="attr-row"><span>${TMC.esc(a.name)}</span><b>${formatModifier(a)}</b></div>`).join("")}
-                 </div>
-               </div>`
-            : ""
-        }
+        <div class="ic-stats">${rows.join("")}</div>
+        ${abilityHtml(item)}
       </div>`;
   }
 
