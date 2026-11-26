@@ -386,7 +386,20 @@
         side.innerHTML =
           `<p class="eyebrow">Gained from this tree</p><div class="tt-rows">${rows.map((r) => `<div class="tt-row"><span>${esc(r.name)}</span><b>${esc(r.value)}</b></div>`).join("")}</div>` +
           (effects.length ? `<p class="eyebrow">Effects</p>${effects.map((e) => `<div class="tt-effect"><b>${esc(e.title)}</b><span>${esc(e.text)}</span></div>`).join("")}` : "") +
-          `<a class="btn" href="#tree/${esc(id)}">Open in the planner</a>`;
+          `<a class="btn pf-planner" href="#tree/${esc(id)}" data-tree-id="${esc(id)}">Open in the planner</a>`;
+        // The planner reads the build from #tree/<category>/<encoded>; every tree shown here is preloaded as its plan,
+        // so switching between the main and the mastery tree in the planner keeps both.
+        side.querySelector(".pf-planner").addEventListener("click", (e) => {
+          const T = TMC._tree;
+          if (!T || !T.plans || !T.encodePlan) return;
+          e.preventDefault();
+          shown.forEach((x) => {
+            if (!cats.has(x.id)) return;
+            const model = T.buildModel(cats.get(x.id));
+            T.plans[x.id] = new Set(x.unlocked.filter((n) => model.nodes.has(n)));
+          });
+          location.hash = `#tree/${id}/${T.encodePlan(cats.get(id))}`;
+        });
         root.querySelectorAll("[data-tree]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.tree === id)));
       };
       root.querySelectorAll("[data-tree]").forEach((b) => b.addEventListener("click", () => show(b.dataset.tree)));
