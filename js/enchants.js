@@ -1,6 +1,6 @@
 // Enchantments. Data: data/enchantments.json, from the game and mod jars via Tools/SiteData/build_enchants.py.
 // Max levels are the pack's (Apothic Enchanting config). A searchable list with category chips and treasure/curse
-// toggles; a click slides the card open, where level buttons switch the damage values.
+// toggles; a click slides the card open, where level buttons switch the damage values and per-level stats.
 // Damage enchantments do not add flat damage in this pack: Terminux turns them into a separate multiplier.
 
 (() => {
@@ -30,9 +30,26 @@
     return row(label, `×${TMC.num(m)}`, "lead");
   }
 
+  function levelValue(unit, v) {
+    const pct = (x) => `${TMC.num(Math.round(x * 1000) / 10)}%`;
+    if (unit === "pct") return `+${pct(v)}`;
+    if (unit === "neg") return `-${pct(v)}`;
+    if (unit === "mult") return `×${TMC.num(Math.round(v * 1000) / 1000)}`;
+    if (unit === "spx") return `${TMC.num(Math.round(v * 100) / 100)} × spell power`;
+    return `+${TMC.num(Math.round(v * 100) / 100)}`;
+  }
+
+  function levelRows(e, lvl) {
+    if (!e.levels) return "";
+    return e.levels
+      .map((r, i) => row(r.label, TMC.esc(levelValue(r.unit, r.values[Math.min(lvl, r.values.length) - 1])), i === 0 ? "lead" : ""))
+      .join("");
+  }
+
   function statsHtml(e, lvl) {
     const rows = [];
     rows.push(damageRows(e, lvl));
+    rows.push(levelRows(e, lvl));
     rows.push(row("Max level", TMC.esc(roman(e.maxLevel)) + (e.maxLevel !== e.vanillaMax ? ` <span class="en-dim">(was ${roman(e.vanillaMax)})</span>` : "")));
     if (e.lootMax && e.lootMax < e.maxLevel) rows.push(row("Max level from loot", TMC.esc(roman(e.lootMax))));
     if (e.appliesTo.length) rows.push(row("Applies to", TMC.esc(e.appliesTo.join(", "))));
@@ -49,7 +66,7 @@
     if (e.curse) tags.unshift('<span class="ic-tag unique">Curse</span>');
     else if (e.treasure) tags.unshift('<span class="ic-tag kind">Treasure</span>');
     const levels =
-      e.damage && e.maxLevel > 1
+      (e.damage || e.levels) && e.maxLevel > 1
         ? `<div class="gm-purity" role="group" aria-label="Level">${Array.from({ length: e.maxLevel }, (_, i) => i + 1)
             .map((l) => `<button type="button" class="gm-pbtn en-lvl" data-level="${l}" aria-pressed="${l === lvl}">${roman(l)}</button>`)
             .join("")}</div>`
