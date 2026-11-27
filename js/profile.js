@@ -450,13 +450,47 @@
     container.insertAdjacentHTML(
       "beforeend",
       `<section class="pf">
-        ${worlds.length > 1 ? `<div class="chips-row pf-worlds">${worlds.map((w, i) => `<button type="button" class="chip" data-world="${i}" aria-pressed="${i === 0}">${esc(w.worldName || "World")}${links.length > 1 ? ` · ${esc(w.link.mcName)}` : ""}</button>`).join("")}</div>` : ""}
+        <div class="pf-worlds-bar">
+          <div class="chips-row pf-worlds">${worlds.map((w, i) => `<button type="button" class="chip" data-world="${i}" aria-pressed="${i === 0}">${esc(w.worldName || "World")}${links.length > 1 ? ` · ${esc(w.link.mcName)}` : ""}</button>`).join("")}</div>
+          <button type="button" class="btn pf-remove" data-remove-world>Remove world</button>
+        </div>
         <div class="pf-world"></div>
       </section>`
     );
     const root = container.querySelector(".pf");
     const box = root.querySelector(".pf-world");
+    const remove = root.querySelector("[data-remove-world]");
+    let current = 0;
+    let armTimer = 0;
+    const disarm = () => {
+      clearTimeout(armTimer);
+      remove.classList.remove("armed");
+      remove.textContent = "Remove world";
+    };
+    // Removes the shown world's record; the game writes it again the next time that world is played.
+    const removeWorld = async () => {
+      if (!remove.classList.contains("armed")) {
+        remove.classList.add("armed");
+        remove.textContent = "Confirm remove";
+        armTimer = setTimeout(disarm, 4000);
+        return;
+      }
+      clearTimeout(armTimer);
+      const w = worlds[current];
+      remove.disabled = true;
+      remove.textContent = "Removing…";
+      try {
+        await fb.deleteDoc(fb.doc(fb.db, "players", w.link.uuid, "worlds", w.id));
+        TMC.route(true);
+      } catch (err) {
+        remove.disabled = false;
+        disarm();
+        alert(err && err.code === "permission-denied" ? "Not allowed to remove this world." : "Could not remove this world.");
+      }
+    };
     const show = async (i) => {
+      current = i;
+      disarm();
       const w = worlds[i];
       let snap;
       try {
@@ -471,6 +505,7 @@
       root.querySelectorAll("[data-world]").forEach((b) => b.setAttribute("aria-pressed", String(Number(b.dataset.world) === i)));
     };
     root.addEventListener("click", (e) => {
+      if (e.target.closest("[data-remove-world]")) return removeWorld();
       const wb = e.target.closest("[data-world]");
       if (wb) return show(Number(wb.dataset.world));
       const item = e.target.closest(".pf-item[data-item]");

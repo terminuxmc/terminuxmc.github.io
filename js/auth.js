@@ -266,7 +266,7 @@ TMC.PAGES.profile = async (el) => {
     </section>`;
   TMC.animateIn(el);
   if (links.length && TMC.renderProfile) {
-    TMC.renderProfile(el, { links, fb: { db, collection, getDocs } }).catch(() => {});
+    TMC.renderProfile(el, { links, fb: { db, collection, getDocs, deleteDoc, doc } }).catch(() => {});
   }
   el.addEventListener("click", async (e) => {
     const b = e.target.closest("[data-unlink]");
